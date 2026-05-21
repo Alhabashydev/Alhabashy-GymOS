@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { ArrowLeft, Dumbbell, Plus } from 'lucide-react';
 import type { AppPage, Exercise } from '../types/gym';
 import { useGymStore } from '../hooks/useGymStore';
+import { useLanguage } from '../hooks/useLanguage';
 import { Badge } from '../components/ui/Badge';
 import { BottomSheet } from '../components/ui/BottomSheet';
 import { Button } from '../components/ui/Button';
@@ -18,6 +19,7 @@ interface WorkoutDayDetailProps {
 
 export function WorkoutDayDetail({ dayId, onNavigate }: WorkoutDayDetailProps) {
   const { workoutDays, settings, addExercise, updateExercise, deleteExercise, duplicateExercise, moveExercise, startWorkout } = useGymStore();
+  const { t } = useLanguage();
   const day = workoutDays.find((item) => item.id === dayId) ?? workoutDays[0];
   const [sheetOpen, setSheetOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -26,7 +28,7 @@ export function WorkoutDayDetail({ dayId, onNavigate }: WorkoutDayDetailProps) {
 
   if (!day) {
     return (
-      <EmptyState title="Workout day not found" description="The selected workout day no longer exists." actionLabel="Back to Plan" onAction={() => onNavigate('workouts')} />
+      <EmptyState title={t('detail.notFoundTitle')} description={t('detail.notFoundDescription')} actionLabel={t('detail.backToPlan')} onAction={() => onNavigate('workouts')} />
     );
   }
 
@@ -55,24 +57,24 @@ export function WorkoutDayDetail({ dayId, onNavigate }: WorkoutDayDetailProps) {
   return (
     <div className="space-y-8">
       <div className="flex items-center gap-3">
-        <Button variant="ghost" size="sm" onClick={() => onNavigate('workouts')} leftIcon={<ArrowLeft size={16} />}>Plan</Button>
-        <Badge>{day.exercises.length} exercises</Badge>
+        <Button variant="ghost" size="sm" onClick={() => onNavigate('workouts')} leftIcon={<ArrowLeft size={16} />}>{t('nav.plan')}</Button>
+        <Badge>{day.exercises.length} {t('common.exercises')}</Badge>
       </div>
 
       <SectionHeader
-        eyebrow="Workout day"
+        eyebrow={t('detail.eyebrow')}
         title={day.name}
-        description={day.description || 'Manage exercises, sets, default weights, rest time, and exercise notes.'}
-        action={<Button onClick={openCreate} leftIcon={<Plus size={16} />}>Add Exercise</Button>}
+        description={day.description || t('detail.description')}
+        action={<Button onClick={openCreate} leftIcon={<Plus size={16} />}>{t('detail.addExercise')}</Button>}
       />
 
       <div className="grid gap-3 sm:grid-cols-2">
-        <Button onClick={start} disabled={day.exercises.length === 0} leftIcon={<Dumbbell size={16} />}>Start this workout</Button>
-        <Button variant="secondary" onClick={openCreate}>Add exercise</Button>
+        <Button onClick={start} disabled={day.exercises.length === 0} leftIcon={<Dumbbell size={16} />}>{t('detail.startThisWorkout')}</Button>
+        <Button variant="secondary" onClick={openCreate}>{t('detail.addExerciseLower')}</Button>
       </div>
 
       {day.exercises.length === 0 ? (
-        <EmptyState title="Add your first exercise" description="Each exercise can have sets, target reps, default weight, rest time, and notes." actionLabel="Add Exercise" onAction={openCreate} icon={<Dumbbell size={20} />} />
+        <EmptyState title={t('detail.addFirstExerciseTitle')} description={t('detail.addFirstExerciseDescription')} actionLabel={t('detail.addExercise')} onAction={openCreate} icon={<Dumbbell size={20} />} />
       ) : (
         <div className="grid gap-5 lg:grid-cols-2">
           {day.exercises.map((exercise, index) => (
@@ -92,7 +94,7 @@ export function WorkoutDayDetail({ dayId, onNavigate }: WorkoutDayDetailProps) {
         </div>
       )}
 
-      <BottomSheet open={sheetOpen} title={editingExercise ? 'Edit exercise' : 'Add exercise'} onClose={() => setSheetOpen(false)}>
+      <BottomSheet open={sheetOpen} title={editingExercise ? t('detail.editExercise') : t('detail.addExerciseSheet')} onClose={() => setSheetOpen(false)}>
         <ExerciseForm
           initial={editingExercise}
           defaultRestSeconds={settings.defaultRestSeconds}
@@ -103,9 +105,9 @@ export function WorkoutDayDetail({ dayId, onNavigate }: WorkoutDayDetailProps) {
 
       <ConfirmDialog
         open={Boolean(deleteId)}
-        title="Delete exercise?"
-        description="This removes the exercise from the workout plan. Existing completed workout history stays saved."
-        confirmLabel="Delete"
+        title={t('detail.deleteTitle')}
+        description={t('detail.deleteDescription')}
+        confirmLabel={t('common.delete')}
         danger
         onCancel={() => setDeleteId(null)}
         onConfirm={() => {

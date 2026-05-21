@@ -1,5 +1,6 @@
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useLanguage } from '../../hooks/useLanguage';
 import { cn } from '../../utils/cn';
 
 interface BackButtonProps {
@@ -9,8 +10,10 @@ interface BackButtonProps {
   compact?: boolean;
 }
 
-export function BackButton({ fallback = '/', label = 'Back', className, compact = false }: BackButtonProps) {
+export function BackButton({ fallback = '/', label, className, compact = false }: BackButtonProps) {
   const navigate = useNavigate();
+  const { dir, t } = useLanguage();
+  const Icon = dir === 'rtl' ? ArrowRight : ArrowLeft;
 
   function goBack() {
     const historyIndex = typeof window !== 'undefined' ? window.history.state?.idx : 0;
@@ -30,10 +33,10 @@ export function BackButton({ fallback = '/', label = 'Back', className, compact 
         compact && 'h-11 w-11 px-0',
         className,
       )}
-      aria-label="Go back to previous page"
+      aria-label={t('common.back')}
     >
-      <ArrowLeft size={18} />
-      {!compact && <span>{label}</span>}
+      <Icon size={18} />
+      {!compact && <span>{label ?? t('common.back')}</span>}
     </button>
   );
 }

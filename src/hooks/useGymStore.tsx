@@ -285,7 +285,7 @@ export function GymProvider({ children }: { children: ReactNode }) {
   }, [bodyWeight, setBodyWeight]);
 
   const updateSettings = useCallback((updates: Partial<Settings>) => {
-    setSettings({ ...settings, ...updates, theme: 'dark', language: 'en' });
+    setSettings({ ...settings, ...updates, theme: 'dark' });
   }, [setSettings, settings]);
 
   const exportBackup = useCallback((): GymOSBackup => ({
@@ -305,7 +305,7 @@ export function GymProvider({ children }: { children: ReactNode }) {
     setSessions(backup.sessions);
     setActiveSession(backup.activeSession);
     setBodyWeight(backup.bodyWeight);
-    setSettings(backup.settings);
+    setSettings({ ...defaultSettings, ...backup.settings, theme: 'dark' });
     return { ok: true as const };
   }, [setActiveSession, setBodyWeight, setSessions, setSettings, setWorkoutDays]);
 

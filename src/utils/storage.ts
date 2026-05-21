@@ -76,7 +76,8 @@ export function isSettings(value: unknown): value is Settings {
     maybe &&
     (maybe.weightUnit === 'kg' || maybe.weightUnit === 'lb') &&
     typeof maybe.defaultRestSeconds === 'number' &&
-    typeof maybe.showRestTimer === 'boolean'
+    typeof maybe.showRestTimer === 'boolean' &&
+    (maybe.language === undefined || maybe.language === 'en' || maybe.language === 'ar')
   );
 }
 

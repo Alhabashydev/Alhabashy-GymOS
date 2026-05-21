@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { X } from 'lucide-react';
+import { useLanguage } from '../../hooks/useLanguage';
 import { IconButton } from './IconButton';
 
 interface BottomSheetProps {
@@ -11,6 +12,7 @@ interface BottomSheetProps {
 }
 
 export function BottomSheet({ open, title, children, onClose }: BottomSheetProps) {
+  const { t } = useLanguage();
   return (
     <AnimatePresence>
       {open && (
@@ -33,7 +35,7 @@ export function BottomSheet({ open, title, children, onClose }: BottomSheetProps
             <div className="mx-auto mt-3 h-1 w-12 rounded-full bg-white/20 md:hidden" />
             <div className="flex items-center justify-between border-b border-white/10 p-5">
               <h2 id="sheet-title" className="font-display text-xl font-bold text-text">{title}</h2>
-              <IconButton label="Close" onClick={onClose}><X size={18} /></IconButton>
+              <IconButton label={t('common.close')} onClick={onClose}><X size={18} /></IconButton>
             </div>
             <div className="max-h-[calc(90vh-88px)] overflow-y-auto p-5">{children}</div>
           </motion.div>

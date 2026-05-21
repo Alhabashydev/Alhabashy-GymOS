@@ -1,28 +1,30 @@
 import type { LucideIcon } from 'lucide-react';
 import { Dumbbell, History, Home, LineChart, ListChecks } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
+import { useLanguage } from '../../hooks/useLanguage';
 import { cn } from '../../utils/cn';
 
 interface NavItem {
   to: string;
-  label: string;
+  labelKey: string;
   icon: LucideIcon;
   isActive: (pathname: string) => boolean;
 }
 
 const items: NavItem[] = [
-  { to: '/', label: 'Home', icon: Home, isActive: (path) => path === '/' },
-  { to: '/plan', label: 'Plan', icon: ListChecks, isActive: (path) => path.startsWith('/plan') },
-  { to: '/train', label: 'Train', icon: Dumbbell, isActive: (path) => path.startsWith('/train') },
-  { to: '/history', label: 'History', icon: History, isActive: (path) => path.startsWith('/history') },
-  { to: '/weight', label: 'Weight', icon: LineChart, isActive: (path) => path.startsWith('/weight') },
+  { to: '/', labelKey: 'nav.home', icon: Home, isActive: (path) => path === '/' },
+  { to: '/plan', labelKey: 'nav.plan', icon: ListChecks, isActive: (path) => path.startsWith('/plan') },
+  { to: '/train', labelKey: 'nav.train', icon: Dumbbell, isActive: (path) => path.startsWith('/train') },
+  { to: '/history', labelKey: 'nav.history', icon: History, isActive: (path) => path.startsWith('/history') },
+  { to: '/weight', labelKey: 'nav.weight', icon: LineChart, isActive: (path) => path.startsWith('/weight') },
 ];
 
 export function MobileBottomNav() {
   const location = useLocation();
+  const { t } = useLanguage();
 
   return (
-    <nav className="safe-bottom fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-page/85 backdrop-blur-xl md:hidden" aria-label="Main navigation">
+    <nav className="safe-bottom fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-page/85 backdrop-blur-xl md:hidden" aria-label={t('common.mainNavigation')}>
       <div className="grid grid-cols-5 px-1 py-2">
         {items.map((item) => {
           const Icon = item.icon;
@@ -38,7 +40,7 @@ export function MobileBottomNav() {
               aria-current={active ? 'page' : undefined}
             >
               <Icon size={20} />
-              <span>{item.label}</span>
+              <span>{t(item.labelKey)}</span>
             </NavLink>
           );
         })}

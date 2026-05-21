@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { History as HistoryIcon, Search } from 'lucide-react';
 import { useGymStore } from '../hooks/useGymStore';
+import { useLanguage } from '../hooks/useLanguage';
 import type { WorkoutSession } from '../types/gym';
 import { BottomSheet } from '../components/ui/BottomSheet';
 import { ConfirmDialog } from '../components/ui/ConfirmDialog';
@@ -13,6 +14,7 @@ import { SessionDetail } from '../components/history/SessionDetail';
 
 export function History() {
   const { sessions, workoutDays, settings, deleteSession } = useGymStore();
+  const { t } = useLanguage();
   const [query, setQuery] = useState('');
   const [filterDay, setFilterDay] = useState('all');
   const [selected, setSelected] = useState<WorkoutSession | null>(null);
@@ -26,20 +28,20 @@ export function History() {
 
   return (
     <div className="space-y-8">
-      <SectionHeader eyebrow="History" title="Workout history" description="Review completed sessions with sets, reps, weights, and notes." />
+      <SectionHeader eyebrow={t('history.eyebrow')} title={t('history.title')} description={t('history.description')} />
 
       <div className="grid gap-4 md:grid-cols-[1fr_260px]">
-        <Input label="Search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search by exercise name" />
-        <Select label="Filter by day" value={filterDay} onChange={(event) => setFilterDay(event.target.value)}>
-          <option value="all">All workout days</option>
+        <Input label={t('history.search')} value={query} onChange={(event) => setQuery(event.target.value)} placeholder={t('history.searchPlaceholder')} />
+        <Select label={t('history.filterByDay')} value={filterDay} onChange={(event) => setFilterDay(event.target.value)}>
+          <option value="all">{t('history.allDays')}</option>
           {workoutDays.map((day) => <option key={day.id} value={day.id}>{day.name}</option>)}
         </Select>
       </div>
 
       {sessions.length === 0 ? (
-        <EmptyState title="Finish a workout to see it here" description="Completed workout sessions will appear in this list." icon={<HistoryIcon size={20} />} />
+        <EmptyState title={t('history.emptyTitle')} description={t('history.emptyDescription')} icon={<HistoryIcon size={20} />} />
       ) : filtered.length === 0 ? (
-        <EmptyState title="No matching sessions" description="Try another exercise name or workout day filter." icon={<Search size={20} />} />
+        <EmptyState title={t('history.noMatchTitle')} description={t('history.noMatchDescription')} icon={<Search size={20} />} />
       ) : (
         <div className="grid gap-5 lg:grid-cols-2">
           {filtered.map((session) => (
@@ -54,15 +56,15 @@ export function History() {
         </div>
       )}
 
-      <BottomSheet open={Boolean(selected)} title="Session detail" onClose={() => setSelected(null)}>
+      <BottomSheet open={Boolean(selected)} title={t('history.sessionDetail')} onClose={() => setSelected(null)}>
         {selected && <SessionDetail session={selected} unit={settings.weightUnit} />}
       </BottomSheet>
 
       <ConfirmDialog
         open={Boolean(deleteId)}
-        title="Delete workout session?"
-        description="This permanently removes this completed workout from your local history."
-        confirmLabel="Delete"
+        title={t('history.deleteTitle')}
+        description={t('history.deleteDescription')}
+        confirmLabel={t('common.delete')}
         danger
         onCancel={() => setDeleteId(null)}
         onConfirm={() => {

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Plus, ListChecks } from 'lucide-react';
 import type { AppPage } from '../types/gym';
 import { useGymStore } from '../hooks/useGymStore';
+import { useLanguage } from '../hooks/useLanguage';
 import { BottomSheet } from '../components/ui/BottomSheet';
 import { Button } from '../components/ui/Button';
 import { ConfirmDialog } from '../components/ui/ConfirmDialog';
@@ -17,6 +18,7 @@ interface WorkoutsProps {
 
 export function Workouts({ onNavigate }: WorkoutsProps) {
   const { workoutDays, addWorkoutDay, updateWorkoutDay, deleteWorkoutDay, moveWorkoutDay, startWorkout } = useGymStore();
+  const { t } = useLanguage();
   const [sheetOpen, setSheetOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -45,7 +47,7 @@ export function Workouts({ onNavigate }: WorkoutsProps) {
 
   function saveDay() {
     if (!name.trim()) {
-      setError('Workout day name is required.');
+      setError(t('workouts.dayNameRequired'));
       return;
     }
     if (editingId) {
@@ -64,14 +66,14 @@ export function Workouts({ onNavigate }: WorkoutsProps) {
   return (
     <div className="space-y-8">
       <SectionHeader
-        eyebrow="Plan"
-        title="Workout days"
-        description="Manage your training days and keep the plan simple enough to use inside the gym."
-        action={<Button onClick={openCreate} leftIcon={<Plus size={16} />}>Add Day</Button>}
+        eyebrow={t('workouts.eyebrow')}
+        title={t('workouts.title')}
+        description={t('workouts.description')}
+        action={<Button onClick={openCreate} leftIcon={<Plus size={16} />}>{t('workouts.addDay')}</Button>}
       />
 
       {workoutDays.length === 0 ? (
-        <EmptyState title="Create your first workout day" description="Add a day, then add exercises with sets, target reps, weight, and notes." actionLabel="Add Workout Day" onAction={openCreate} icon={<ListChecks size={20} />} />
+        <EmptyState title={t('workouts.createFirstTitle')} description={t('workouts.createFirstDescription')} actionLabel={t('workouts.addWorkoutDay')} onAction={openCreate} icon={<ListChecks size={20} />} />
       ) : (
         <div className="grid gap-5 lg:grid-cols-2">
           {workoutDays.map((day, index) => (
@@ -91,23 +93,23 @@ export function Workouts({ onNavigate }: WorkoutsProps) {
         </div>
       )}
 
-      <BottomSheet open={sheetOpen} title={editingDay ? 'Edit workout day' : 'Add workout day'} onClose={() => setSheetOpen(false)}>
+      <BottomSheet open={sheetOpen} title={editingDay ? t('workouts.editDay') : t('workouts.addDaySheet')} onClose={() => setSheetOpen(false)}>
         <div className="space-y-5">
-          <Input label="Day name" value={name} onChange={(event) => setName(event.target.value)} placeholder="Saturday — Upper A" autoFocus />
-          <Textarea label="Description" value={description} onChange={(event) => setDescription(event.target.value)} placeholder="Back, shoulders, and arms." />
+          <Input label={t('workouts.dayName')} value={name} onChange={(event) => setName(event.target.value)} placeholder="Saturday — Upper A" autoFocus />
+          <Textarea label={t('workouts.descriptionLabel')} value={description} onChange={(event) => setDescription(event.target.value)} placeholder={t('workouts.descriptionPlaceholder')} />
           {error && <p className="rounded-control border border-danger/25 bg-danger/10 p-3 text-sm text-danger">{error}</p>}
           <div className="sticky bottom-0 -mx-5 -mb-5 flex gap-3 border-t border-white/10 bg-surface p-5">
-            <Button variant="secondary" fullWidth onClick={() => setSheetOpen(false)}>Cancel</Button>
-            <Button fullWidth onClick={saveDay}>Save day</Button>
+            <Button variant="secondary" fullWidth onClick={() => setSheetOpen(false)}>{t('common.cancel')}</Button>
+            <Button fullWidth onClick={saveDay}>{t('workouts.saveDay')}</Button>
           </div>
         </div>
       </BottomSheet>
 
       <ConfirmDialog
         open={Boolean(deleteId)}
-        title="Delete workout day?"
-        description="This removes the workout day and all exercises inside it. Completed history stays saved."
-        confirmLabel="Delete"
+        title={t('workouts.deleteTitle')}
+        description={t('workouts.deleteDescription')}
+        confirmLabel={t('common.delete')}
         danger
         onCancel={() => setDeleteId(null)}
         onConfirm={() => {

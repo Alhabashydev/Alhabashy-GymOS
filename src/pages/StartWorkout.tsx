@@ -4,6 +4,7 @@ import type { AppPage } from '../types/gym';
 import { formatDuration, secondsBetween } from '../utils/dates';
 import { getWorkoutSummary } from '../utils/workoutMath';
 import { useGymStore } from '../hooks/useGymStore';
+import { useLanguage } from '../hooks/useLanguage';
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
@@ -30,6 +31,7 @@ export function StartWorkout({ onNavigate }: StartWorkoutProps) {
     finishWorkout,
     cancelWorkout,
   } = useGymStore();
+  const { language, t, muscle } = useLanguage();
 
   const [elapsed, setElapsed] = useState(0);
   const [cancelOpen, setCancelOpen] = useState(false);
@@ -58,18 +60,18 @@ export function StartWorkout({ onNavigate }: StartWorkoutProps) {
   if (!activeSession) {
     return (
       <div className="space-y-8">
-        <SectionHeader eyebrow="Train" title="Start workout" description="Choose a workout day, then track every set with large controls." />
+        <SectionHeader eyebrow={t('train.eyebrow')} title={t('train.title')} description={t('train.description')} />
         {workoutDays.length === 0 ? (
-          <EmptyState title="Create your first workout day" description="You need at least one workout day before training." actionLabel="Manage Plan" onAction={() => onNavigate('workouts')} icon={<Dumbbell size={20} />} />
+          <EmptyState title={t('train.createFirstTitle')} description={t('train.createFirstDescription')} actionLabel={t('dashboard.managePlan')} onAction={() => onNavigate('workouts')} icon={<Dumbbell size={20} />} />
         ) : (
           <div className="grid gap-5 lg:grid-cols-2">
             {workoutDays.map((day) => (
               <Card key={day.id} interactive className="space-y-4">
                 <div>
                   <h2 className="font-display text-xl font-bold text-text">{day.name}</h2>
-                  <p className="mt-2 text-sm text-muted">{day.exercises.length} exercises</p>
+                  <p className="mt-2 text-sm text-muted">{day.exercises.length} {t('common.exercises')}</p>
                 </div>
-                <Button fullWidth disabled={day.exercises.length === 0} onClick={() => chooseWorkout(day.id)} leftIcon={<Play size={16} />}>Start Workout</Button>
+                <Button fullWidth disabled={day.exercises.length === 0} onClick={() => chooseWorkout(day.id)} leftIcon={<Play size={16} />}>{t('train.startWorkout')}</Button>
               </Card>
             ))}
           </div>
@@ -81,14 +83,14 @@ export function StartWorkout({ onNavigate }: StartWorkoutProps) {
   return (
     <div className="space-y-6">
       <SectionHeader
-        eyebrow="Active workout"
+        eyebrow={t('train.activeEyebrow')}
         title={activeSession.workoutDayName}
-        description={`${summary?.completedSets ?? 0}/${summary?.totalSets ?? 0} sets done • ${formatDuration(elapsed)}`}
+        description={`${t('train.setsDone', { done: summary?.completedSets ?? 0, total: summary?.totalSets ?? 0 })} • ${formatDuration(elapsed, language)}`}
       />
 
       <div className="sticky top-[80px] z-20 rounded-card border border-white/10 bg-page/85 p-3 backdrop-blur-xl">
         <div className="mb-3 flex items-center justify-between gap-3">
-          <p className="text-sm text-muted">Progress</p>
+          <p className="text-sm text-muted">{t('common.progress')}</p>
           <p className="text-sm font-medium text-accent">{summary?.completedSets ?? 0}/{summary?.totalSets ?? 0}</p>
         </div>
         <div className="h-2 overflow-hidden rounded-full bg-white/10">
@@ -104,15 +106,15 @@ export function StartWorkout({ onNavigate }: StartWorkoutProps) {
             <Card key={exercise.id} className="space-y-5">
               <div className="flex flex-wrap items-center gap-2">
                 <h2 className="font-display text-xl font-bold text-text">{exercise.name}</h2>
-                <Badge>{exercise.muscleGroup}</Badge>
-                <Badge>{restSeconds}s rest</Badge>
+                <Badge>{muscle(exercise.muscleGroup)}</Badge>
+                <Badge>{restSeconds}s {t('common.rest')}</Badge>
               </div>
               <div className="rounded-card border border-white/10 bg-black/20 p-4">
                 <Textarea
-                  label="Exercise notes"
+                  label={t('train.exerciseNotes')}
                   value={exercise.notes}
                   onChange={(event) => updateSessionExerciseNotes(exercise.id, event.target.value, false)}
-                  placeholder="Write notes for this workout."
+                  placeholder={t('train.notesPlaceholder')}
                   className="min-h-24"
                 />
                 <Button
@@ -121,7 +123,7 @@ export function StartWorkout({ onNavigate }: StartWorkoutProps) {
                   size="sm"
                   onClick={() => updateSessionExerciseNotes(exercise.id, exercise.notes, true)}
                 >
-                  Update plan note too
+                  {t('train.updatePlanNote')}
                 </Button>
               </div>
               <div className="space-y-4">
@@ -146,8 +148,8 @@ export function StartWorkout({ onNavigate }: StartWorkoutProps) {
       <Card className="space-y-4">
         <WorkoutSummary session={activeSession} unit={settings.weightUnit} />
         <div className="grid gap-3 sm:grid-cols-2">
-          <Button onClick={() => setFinishOpen(true)} leftIcon={<CheckCircle2 size={16} />}>Finish Workout</Button>
-          <Button variant="danger" onClick={() => setCancelOpen(true)} leftIcon={<XCircle size={16} />}>Cancel Workout</Button>
+          <Button onClick={() => setFinishOpen(true)} leftIcon={<CheckCircle2 size={16} />}>{t('train.finishWorkout')}</Button>
+          <Button variant="danger" onClick={() => setCancelOpen(true)} leftIcon={<XCircle size={16} />}>{t('train.cancelWorkout')}</Button>
         </div>
       </Card>
 
@@ -155,9 +157,9 @@ export function StartWorkout({ onNavigate }: StartWorkoutProps) {
 
       <ConfirmDialog
         open={cancelOpen}
-        title="Cancel active workout?"
-        description="This will delete the unfinished active workout. Your completed workout history will not be affected."
-        confirmLabel="Cancel workout"
+        title={t('train.cancelTitle')}
+        description={t('train.cancelDescription')}
+        confirmLabel={t('train.cancelWorkout')}
         danger
         onCancel={() => setCancelOpen(false)}
         onConfirm={() => {
@@ -168,9 +170,9 @@ export function StartWorkout({ onNavigate }: StartWorkoutProps) {
 
       <ConfirmDialog
         open={finishOpen}
-        title="Finish workout?"
-        description="This saves the workout to history with your sets, reps, weights, and notes."
-        confirmLabel="Save Workout"
+        title={t('train.finishTitle')}
+        description={t('train.finishDescription')}
+        confirmLabel={t('train.saveWorkout')}
         onCancel={() => setFinishOpen(false)}
         onConfirm={() => {
           const completed = finishWorkout();
@@ -184,23 +186,24 @@ export function StartWorkout({ onNavigate }: StartWorkoutProps) {
 
 function CompletedSummary({ sessionId, onNavigate }: { sessionId: string; onNavigate: (page: AppPage, id?: string) => void }) {
   const { sessions, settings } = useGymStore();
+  const { t } = useLanguage();
   const session = sessions.find((item) => item.id === sessionId);
 
   if (!session) {
-    return <EmptyState title="Workout saved" description="Your workout was saved to history." actionLabel="View History" onAction={() => onNavigate('history')} />;
+    return <EmptyState title={t('train.savedTitle')} description={t('train.savedDescription')} actionLabel={t('train.viewHistory')} onAction={() => onNavigate('history')} />;
   }
 
   return (
     <div className="space-y-6">
-      <SectionHeader eyebrow="Saved" title="Workout complete" description="Your session is saved in workout history." />
+      <SectionHeader eyebrow={t('train.completeEyebrow')} title={t('train.completeTitle')} description={t('train.completeDescription')} />
       <WorkoutSummary session={session} unit={settings.weightUnit} />
       <div className="grid gap-3 sm:grid-cols-2">
-        <Button onClick={() => onNavigate('dashboard')}>Back to Dashboard</Button>
-        <Button variant="secondary" onClick={() => onNavigate('history')}>View History</Button>
+        <Button onClick={() => onNavigate('dashboard')}>{t('train.backDashboard')}</Button>
+        <Button variant="secondary" onClick={() => onNavigate('history')}>{t('train.viewHistory')}</Button>
       </div>
       <Card className="flex items-start gap-3 border-accent/20 bg-accent/5">
         <AlertTriangle className="mt-1 text-accent" size={18} />
-        <p className="text-sm leading-6 text-muted">No PRs, scores, or smart suggestions are shown. GymOS only saves the workout data you entered.</p>
+        <p className="text-sm leading-6 text-muted">{t('train.cleanNote')}</p>
       </Card>
     </div>
   );

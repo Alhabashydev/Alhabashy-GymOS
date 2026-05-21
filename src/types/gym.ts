@@ -64,7 +64,7 @@ export interface Settings {
   defaultRestSeconds: number;
   showRestTimer: boolean;
   theme: 'dark';
-  language: 'en';
+  language: 'en' | 'ar';
 }
 
 export interface WorkoutSummaryData {
